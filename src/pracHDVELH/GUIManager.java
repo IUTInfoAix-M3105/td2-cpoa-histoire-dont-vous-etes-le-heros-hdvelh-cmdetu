@@ -16,6 +16,10 @@ public class GUIManager {
   private PrintStream out, err;
   private InputStream in;
   private Scanner inputReader;
+  
+  public String read() {
+	  return inputReader.nextLine();
+  }
 
   /**
    * @param s

@@ -24,7 +24,12 @@ public class NodeMultiple {
 	/* Overridden methods */
 	@Override
 	public String toString() {
-		/* TO BE COMPLETED */
+		int daughtersCount = 0;
+		
+		while(daughtersCount < NODE_MAX_ARITY && daughters[daughtersCount] != null)
+			++daughtersCount;
+		
+		return daughtersCount + "daughters";
 	}
 
 	/* Getters/Setters */
@@ -37,7 +42,7 @@ public class NodeMultiple {
 	 * @return the {@code i}th daughter node, or {@code null} if it does not exist.
 	 */
 	public NodeMultiple getDaughter(int i) {
-		if(i < 0 || i >= daughters.length)
+		if(i < 0 || i >= NODE_MAX_ARITY)
 			ErrorNaiveHandler.abort(ERROR_STATUS_INDEX_OUT_OF_RANGE, ERROR_MSG_INDEX_OUT_OF_RANGE);
 		return daughters[i];
 	}
@@ -57,7 +62,7 @@ public class NodeMultiple {
 	 * @param i        the daughter node's index
 	 */
 	public void setDaughter(NodeMultiple daughter, int i) {
-		if(i < 0 || i >= daughters.length)
+		if(i < 0 || i >= NODE_MAX_ARITY)
 			ErrorNaiveHandler.abort(ERROR_STATUS_INDEX_OUT_OF_RANGE, ERROR_MSG_INDEX_OUT_OF_RANGE);
 		daughters[i] = daughter;
 	}
@@ -85,9 +90,9 @@ public class NodeMultiple {
 	 * @param daughter
 	 */
 	public void addDaughter(NodeMultiple daughter) {
-		for(int i = 0; i < daughters.length; ++i)
+		for(int i = 0; i < NODE_MAX_ARITY; ++i)
 		{
-			if(daughters[i] != null)
+			if(daughters[i] == null)
 			{
 				daughters[i] = daughter;
 				return;
@@ -115,7 +120,7 @@ public class NodeMultiple {
 	 *         daughter node.
 	 */
 	public boolean hasDaughters() {
-		for(int i = 0; i < daughters.length; ++i)
+		for(int i = 0; i < NODE_MAX_ARITY; ++i)
 			if(daughters[i] != null)
 				return true;
 		return false;
