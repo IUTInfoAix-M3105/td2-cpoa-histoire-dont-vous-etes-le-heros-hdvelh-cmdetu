@@ -17,14 +17,14 @@ public class Event extends NodeMultiple {
 	public static final String ERROR_MSG_UNEXPECTED_END = "Sorry, for some unexpected reason the story ends here...";
 	public static final String PROMPT_ANSWER = "Answer: ";
 	public static final String WARNING_MSG_INTEGER_EXPECTED = "Please input a integer within range!";
-	
+
 	private static int nextId = 0;
 
 	private int id;
 	private GUIManager gui;
 	private String playerAnswer;
 	private int chosenPath = 0;
-	
+
 	/**
 	 * @return the playerAnswer
 	 */
@@ -58,7 +58,9 @@ public class Event extends NodeMultiple {
 	 * @see pracHDVELH.NodeMultiple#getData()
 	 */
 	public String getData() {
-		return (String)super.getData();
+		if (super.getData() != null && super.getData().getClass().equals(String.class))
+			return (String) super.getData();
+		return null; // if date is not a String
 	}
 
 	/**
@@ -74,7 +76,9 @@ public class Event extends NodeMultiple {
 	 */
 	@Override
 	public Event getDaughter(int i) {
-		return (Event)super.getDaughter(i);
+		if (super.getDaughters() != null && super.getData().getClass().equals(String.class))
+			return (Event) super.getDaughter(i);
+		return null;
 	}
 
 	/**
@@ -107,21 +111,58 @@ public class Event extends NodeMultiple {
 		return id;
 	}
 
-	
-	
 	public void run() {
-		if(isFinal()) return;
-		gui.outputln((String)getData());
+		if (isFinal())
+			return;
+		
+		gui.outputln(getData());
 		gui.outputln(PROMPT_ANSWER);
-		
-		playerAnswer = gui.read();
-		chosenPath = interpretAnswer();
-		while(chosenPath == -1) {
-			playerAnswer = gui.read();
-			chosenPath = interpretAnswer();
+
+		setPlayerAnswer(gui.read());
+		setChosenPath(interpretAnswer());
+		while (chosenPath == -1) {
+			setPlayerAnswer(gui.read());
+			setChosenPath(interpretAnswer());
 		}
-		
+
 		getDaughter(chosenPath).run();
+	}
+
+	@Override
+	public String toString() {
+		return "Event #" + id + "(" + getClass().getName() + "): " + (String) getData();
+	}
+
+	public boolean isFinal() {
+		return !hasDaughters();
+	}
+
+	public boolean isInRange(int index) {
+		if (index < 0)
+			return false;
+		int max = 0;
+		while (max < NODE_MAX_ARITY && getDaughter(max) != null) {
+			max += 1;
+		}
+
+		return (index >= max ? false : true);
+	}
+
+	public int interpretAnswer() {
+		if (isFinal())
+			return -1;
+
+		try {
+			int res = Integer.parseInt(playerAnswer);
+			res -= 1;
+
+			if (!isInRange(res)) // not in range
+				return -1;
+			return res;
+		} catch (NumberFormatException e) { // if the string does not contain a parsable integer
+			gui.outputln(WARNING_MSG_INTEGER_EXPECTED);
+		}
+		return -1;
 	}
 	
 	public Event(GUIManager gui, String data) {
@@ -129,48 +170,10 @@ public class Event extends NodeMultiple {
 		this.gui = gui;
 		this.id = nextId++;
 	}
-	
+
 	public Event() {
-		//super(null)
 		gui = new GUIManager();
 		this.id = nextId++;
-	}
-	
-	@Override
-	public String toString() {
-		return "Event #" + id + "(" + getClass() + "): " + (String)getData();
-	}
-	
-	public boolean isFinal() {
-		return !hasDaughters();
-	}
-	
-	public boolean isInRange(int index) {
-		if(index < 0) return false;
-		int max = 0;
-		while(max < NODE_MAX_ARITY && getDaughter(max) != null) {
-			max += 1;
-		}
-
-		return (index >= max ? false : true);
-	}
-	
-	public int interpretAnswer() {
-		if(isFinal())
-			return -1;
-		
-		try {
-			int res = Integer.parseInt(playerAnswer);
-			res -= 1;
-			
-			if(!isInRange(res)) // not in range
-				return -1;
-			return res;
-		}
-		catch(NumberFormatException e) { // if the string does not contain a parsable integer
-			gui.outputln(WARNING_MSG_INTEGER_EXPECTED);
-		}
-		return -1;
 	}
 }
 

@@ -42,11 +42,11 @@ public class Scenario {
 	public String run() {
 		if(head == null) {
 			gui.output(MSG_EMPTY_SCENARIO);
-			return ""; // pourquoi renvoyer une String ??
+			return MSG_EMPTY_SCENARIO;
 		}
 		else {
 			head.run();
-			return MSG_FINALE; // ???
+			return MSG_FINALE;
 		}
 	}
 	
@@ -85,11 +85,11 @@ public class Scenario {
 		// ***E
 		// ***event3
 
-		/*Event event3 = new EventExactSolution(gui, "Wizard: how much is worth pi?", "3.14159");
+		Event event3 = new EventExactSolution(gui, "Wizard: how much is worth pi?", "3.14159", 0);
 		event2.setData(event2.getData() + " (3)2.3");
 		event2.addDaughter(event3);
 		event3.addDaughter(endEvent);
-		event3.addDaughter(event3);*/
+		event3.addDaughter(event3);
 
 		/* ******* */
 		// **2.3

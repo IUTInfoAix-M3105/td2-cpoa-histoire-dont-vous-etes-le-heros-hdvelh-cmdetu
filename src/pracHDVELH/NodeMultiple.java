@@ -18,7 +18,7 @@ public class NodeMultiple {
 	public static int NODE_MAX_ARITY = 10;
 
 	// les arcs des graphes sont modélisés par des références vers d'autres noeuds dans ce tableau
-	private NodeMultiple[] daughters = new NodeMultiple[NODE_MAX_ARITY];
+	private NodeMultiple[] daughters;
 	private Object data;
 	
 	/* Overridden methods */
@@ -29,7 +29,13 @@ public class NodeMultiple {
 		while(daughtersCount < NODE_MAX_ARITY && daughters[daughtersCount] != null)
 			++daughtersCount;
 		
-		return daughtersCount + "daughters";
+		StringBuilder sb = new StringBuilder();
+		sb.append(date.toString());
+		sb.append(" daughters : ");
+		sb.append(daughtersCount);
+		sb.append("/");
+		sb.append(NODE_MAX_ARITY);
+		return sb.toString();
 	}
 
 	/* Getters/Setters */
@@ -90,6 +96,10 @@ public class NodeMultiple {
 	 * @param daughter
 	 */
 	public void addDaughter(NodeMultiple daughter) {
+		if(daughter == null) {
+			return;
+		}
+		
 		for(int i = 0; i < NODE_MAX_ARITY; ++i)
 		{
 			if(daughters[i] == null)
@@ -131,7 +141,7 @@ public class NodeMultiple {
 	 * Default constructor.
 	 */
 	public NodeMultiple() {
-		this.data = null;
+		this.daughters = new NodeMultiple[NODE_MAX_ARITY];
 	}
 
 	/**
@@ -141,6 +151,7 @@ public class NodeMultiple {
 	 * @param data
 	 */
 	public NodeMultiple(Object data) {
+		this();
 		this.data = data;
 	}
 }
