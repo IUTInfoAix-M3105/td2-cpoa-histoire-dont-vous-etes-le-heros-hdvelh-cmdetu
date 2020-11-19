@@ -4,8 +4,8 @@ public class EventExactSolution extends Event {
 
 	private String exactAnswer;
 	private int precision;
-	private static int SUCCESS_EVENT = 0;
-	private static int ERROR_EVENT = 1;
+	private static final int SUCCESS_EVENT = 0;
+	private static final int ERROR_EVENT = 1;
 
 	public int interpretAnswer() {
 		if (isFinal() || !isInRange(0) || !isInRange(1) || exactAnswer == null)
@@ -61,7 +61,8 @@ public class EventExactSolution extends Event {
 	}
 
 	public EventExactSolution(GUIManager gui, String data, String exactAnswer) {
-		this(exactAnswer);
+		super(gui, data);
+		setExactAnswser(exactAnswer); // évite de faire deux allocations
 		setGui(gui);
 		setData(data);
 	}

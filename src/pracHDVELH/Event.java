@@ -23,7 +23,7 @@ public class Event extends NodeMultiple {
 	private int id;
 	private GUIManager gui;
 	private String playerAnswer;
-	private int chosenPath = 0;
+	private int chosenPath;
 
 	/**
 	 * @return the playerAnswer
@@ -76,7 +76,7 @@ public class Event extends NodeMultiple {
 	 */
 	@Override
 	public Event getDaughter(int i) {
-		if (super.getDaughters() != null && super.getData().getClass().equals(String.class))
+		if (super.getDaughter(i) != null && super.getDaughter(i).getClass().equals(Event.class))
 			return (Event) super.getDaughter(i);
 		return null;
 	}
@@ -110,19 +110,22 @@ public class Event extends NodeMultiple {
 	public int getId() {
 		return id;
 	}
+	
+	private void readAnswer() {
+		gui.outputln(getData());
+		gui.output(PROMPT_ANSWER);
+		setPlayerAnswer(gui.read());
+		setChosenPath(interpretAnswer());
+	}
 
 	public void run() {
 		if (isFinal())
 			return;
-		
-		gui.outputln(getData());
-		gui.outputln(PROMPT_ANSWER);
 
-		setPlayerAnswer(gui.read());
-		setChosenPath(interpretAnswer());
+		readAnswer();
 		while (chosenPath == -1) {
-			setPlayerAnswer(gui.read());
-			setChosenPath(interpretAnswer());
+			gui.outputln(WARNING_MSG_INTEGER_EXPECTED + "\n");
+			readAnswer();
 		}
 
 		getDaughter(chosenPath).run();
@@ -149,22 +152,26 @@ public class Event extends NodeMultiple {
 	}
 
 	public int interpretAnswer() {
-		if (isFinal())
-			return -1;
-
-		try {
-			int res = Integer.parseInt(playerAnswer);
-			res -= 1;
-
-			if (!isInRange(res)) // not in range
-				return -1;
-			return res;
-		} catch (NumberFormatException e) { // if the string does not contain a parsable integer
-			gui.outputln(WARNING_MSG_INTEGER_EXPECTED);
+		if (playerAnswer == null) {
+			ErrorNaiveHandler.abort(ERROR_MSG_UNEXPECTED_END);
 		}
-		return -1;
+
+		if(!playerAnswer.matches("[1-9]+"))
+			return -1;
+		
+		int res = Integer.parseInt(playerAnswer);
+		res -= 1;
+
+		if (!isInRange(res)) // not in range
+			return -1;
+		
+		return res;
 	}
 	
+	/*
+	 * chosenPath = 0 (default)
+	 * playerAnswer will be initializer later
+	 * */
 	public Event(GUIManager gui, String data) {
 		super(data);
 		this.gui = gui;
@@ -172,8 +179,7 @@ public class Event extends NodeMultiple {
 	}
 
 	public Event() {
-		gui = new GUIManager();
-		this.id = nextId++;
+		this(new GUIManager(), "");
 	}
 }
 

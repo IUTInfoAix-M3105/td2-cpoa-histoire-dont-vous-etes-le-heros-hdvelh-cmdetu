@@ -85,7 +85,7 @@ public class Scenario {
 		// ***E
 		// ***event3
 
-		Event event3 = new EventExactSolution(gui, "Wizard: how much is worth pi?", "3.14159", 0);
+		Event event3 = new EventExactSolution(gui, "Wizard: how much is worth pi?", "3.14159", 4);
 		event2.setData(event2.getData() + " (3)2.3");
 		event2.addDaughter(event3);
 		event3.addDaughter(endEvent);
@@ -99,15 +99,17 @@ public class Scenario {
 		// ****event3
 		// ...
 
-		/*int[] mask = { 3, 6, 7 };
-		Event event4 = new EventRandomSolution(gui, "Random choice of the next event...", mask, "Dice rolling... Roll=",
-				"\nNext event is ");
+		int[] mask = { 3, 6, 7 };
+		Event event4 = new EventRandomSolution(gui, "Random choice of the next event...", mask, "Dice rolling... Roll=", "\nNext event is ");
 		event3.setDaughter(event4, 0);
 		event4.addDaughter(event2);
 		event4.addDaughter(endEvent);
-		event4.addDaughter(event3);*/
+		event4.addDaughter(event3);
+		
+		gui.outputln(scenario.getHead().toStringRecurs());
+		gui.outputln("fin");
 
-		System.out.println(scenario.run());
+		gui.outputln(scenario.run());
 	}
 }
 

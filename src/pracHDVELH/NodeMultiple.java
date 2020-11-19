@@ -6,7 +6,9 @@
 package pracHDVELH;
 
 import java.util.ArrayList;
+import java.lang.StringBuilder;
 import myUtils.ErrorNaiveHandler;
+import java.util.HashSet;
 
 /**
  * @author prost
@@ -17,25 +19,58 @@ public class NodeMultiple {
 	public static final String ERROR_MSG_INDEX_OUT_OF_RANGE = "Index out of range";
 	public static int NODE_MAX_ARITY = 10;
 
-	// les arcs des graphes sont modélisés par des références vers d'autres noeuds dans ce tableau
+	// les arcs des graphes sont modélisés par des références vers d'autres noeuds
+	// dans ce tableau
 	private NodeMultiple[] daughters;
 	private Object data;
-	
+
 	/* Overridden methods */
 	@Override
 	public String toString() {
 		int daughtersCount = 0;
-		
-		while(daughtersCount < NODE_MAX_ARITY && daughters[daughtersCount] != null)
+
+		while (daughtersCount < NODE_MAX_ARITY && daughters[daughtersCount] != null)
 			++daughtersCount;
-		
+
 		StringBuilder sb = new StringBuilder();
-		sb.append(date.toString());
+		sb.append(data.toString());
 		sb.append(" daughters : ");
 		sb.append(daughtersCount);
 		sb.append("/");
 		sb.append(NODE_MAX_ARITY);
 		return sb.toString();
+	}
+
+	private String privateToStringRecurs(HashSet<Object> visitedNodes, int level) {
+		// visitedObject != null
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < level; ++i)
+			sb.append("\t");
+		
+		sb.append((data != null ? data.toString().replace('\n', ' ') : "null") + "\n");
+		
+
+		if(daughters != null) {
+			for (int i = 0; i < NODE_MAX_ARITY; ++i) {
+				if (daughters[i] != null) {
+					HashSet<Object> hs = (HashSet<Object>) visitedNodes.clone();
+					if (hs.add(daughters[i]))
+						sb.append(daughters[i].privateToStringRecurs(hs, level + 1));
+					else {
+						for(int j = 0; j < level + 1; ++j)
+							sb.append("\t");
+						sb.append((daughters[i].getData() != null ? daughters[i].getData().toString().replace('\n', ' ') : "null") + "\n");
+					}
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	public String toStringRecurs() {
+		HashSet<Object> hs = new HashSet<Object>();
+		hs.add(this);
+		return privateToStringRecurs(hs, 0);
 	}
 
 	/* Getters/Setters */
@@ -48,7 +83,7 @@ public class NodeMultiple {
 	 * @return the {@code i}th daughter node, or {@code null} if it does not exist.
 	 */
 	public NodeMultiple getDaughter(int i) {
-		if(i < 0 || i >= NODE_MAX_ARITY)
+		if (i < 0 || i >= NODE_MAX_ARITY)
 			ErrorNaiveHandler.abort(ERROR_STATUS_INDEX_OUT_OF_RANGE, ERROR_MSG_INDEX_OUT_OF_RANGE);
 		return daughters[i];
 	}
@@ -68,7 +103,7 @@ public class NodeMultiple {
 	 * @param i        the daughter node's index
 	 */
 	public void setDaughter(NodeMultiple daughter, int i) {
-		if(i < 0 || i >= NODE_MAX_ARITY)
+		if (i < 0 || i >= NODE_MAX_ARITY)
 			ErrorNaiveHandler.abort(ERROR_STATUS_INDEX_OUT_OF_RANGE, ERROR_MSG_INDEX_OUT_OF_RANGE);
 		daughters[i] = daughter;
 	}
@@ -96,19 +131,17 @@ public class NodeMultiple {
 	 * @param daughter
 	 */
 	public void addDaughter(NodeMultiple daughter) {
-		if(daughter == null) {
+		if (daughter == null) {
 			return;
 		}
-		
-		for(int i = 0; i < NODE_MAX_ARITY; ++i)
-		{
-			if(daughters[i] == null)
-			{
+
+		for (int i = 0; i < NODE_MAX_ARITY; ++i) {
+			if (daughters[i] == null) {
 				daughters[i] = daughter;
 				return;
 			}
 		}
-		//not set (no abort)
+		// not set (no abort)
 	}
 
 	/**
@@ -130,8 +163,8 @@ public class NodeMultiple {
 	 *         daughter node.
 	 */
 	public boolean hasDaughters() {
-		for(int i = 0; i < NODE_MAX_ARITY; ++i)
-			if(daughters[i] != null)
+		for (int i = 0; i < NODE_MAX_ARITY; ++i)
+			if (daughters[i] != null)
 				return true;
 		return false;
 	}
