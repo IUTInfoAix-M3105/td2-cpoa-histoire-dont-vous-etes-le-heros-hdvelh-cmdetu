@@ -48,6 +48,9 @@ public class EventRandomSolution extends Event {
 	 * */
 	@Override
 	public int interpretAnswer() {
+		if(partition == null)
+			ErrorNaiveHandler.abort(ERROR_STATUS_BAD_SETTINGS, ERROR_MSG_BAD_SETTINGS);
+		
 		int i = 0;
 		while(i < partition.length && randomSolution > partition[i])
 			++i;
@@ -112,4 +115,9 @@ public class EventRandomSolution extends Event {
 		randomGenerator = new Random();
 		setPartition(partition);
 	}
+	
+	public EventRandomSolution() {
+		this(new GUIManager(), "", null, "", "");
+	}
+	
 }
