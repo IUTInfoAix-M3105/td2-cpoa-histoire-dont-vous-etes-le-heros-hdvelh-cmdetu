@@ -17,49 +17,55 @@ import java.util.HashSet;
 public class NodeMultiple {
 	public static final int ERROR_STATUS_INDEX_OUT_OF_RANGE = -1;
 	public static final String ERROR_MSG_INDEX_OUT_OF_RANGE = "Index out of range";
+	public static final int ERROR_STATUS_DAUGHTER_IS_NULL = -2;
+	public static final String ERROR_MSG_DAUGHTER_IS_NULL = "Daughters is null";
 	public static int NODE_MAX_ARITY = 10;
 
 	// les arcs des graphes sont modélisés par des références vers d'autres noeuds
-	// dans ce tableau
+	// dans le tableau daughters
+
+	/*
+	 * Array containing references to the daughters nodes
+	 */
 	private NodeMultiple[] daughters;
+
+	/*
+	 * node data
+	 */
 	private Object data;
 
-	/* Overridden methods */
+	/*
+	 * returns a string containing data.toString() followed by the actual number of
+	 * daughters and the maximum number of daughters example : "160 : 0/10" (here,
+	 * data is an Integer)
+	 */
 	@Override
 	public String toString() {
-		int daughtersCount = 0;
-
-		while (daughtersCount < NODE_MAX_ARITY && daughters[daughtersCount] != null)
-			++daughtersCount;
-
-		StringBuilder sb = new StringBuilder();
-		sb.append(data.toString());
-		sb.append(" daughters : ");
-		sb.append(daughtersCount);
-		sb.append("/");
-		sb.append(NODE_MAX_ARITY);
-		return sb.toString();
+		return (data != null ? data.toString() : "");
 	}
 
+	/*
+	 * return a hierarchical representation of the graph if this node is its root
+	 * node (triggered by toStringRecurs())
+	 */
 	private String privateToStringRecurs(HashSet<Object> visitedNodes, int level) {
 		// visitedObject != null
 		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < level; ++i)
+		for (int i = 0; i < level; ++i)
 			sb.append("\t");
-		
-		sb.append((data != null ? data.toString().replace('\n', ' ') : "null") + "\n");
-		
 
-		if(daughters != null) {
+		sb.append("- " + (data != null ? data.toString().replace('\n', ' ') : "null") + "\n");
+
+		if (daughters != null) {
 			for (int i = 0; i < NODE_MAX_ARITY; ++i) {
 				if (daughters[i] != null) {
 					HashSet<Object> hs = (HashSet<Object>) visitedNodes.clone();
 					if (hs.add(daughters[i]))
 						sb.append(daughters[i].privateToStringRecurs(hs, level + 1));
 					else {
-						for(int j = 0; j < level + 1; ++j)
+						for (int j = 0; j < level + 1; ++j)
 							sb.append("\t");
-						sb.append((daughters[i].getData() != null ? daughters[i].getData().toString().replace('\n', ' ') : "null") + "\n");
+						sb.append("- " + (daughters[i].getData() != null ? daughters[i].getData().toString().replace('\n', ' ') : "null") + "\n");
 					}
 				}
 			}
@@ -67,6 +73,12 @@ public class NodeMultiple {
 		return sb.toString();
 	}
 
+	/*
+	 * return a hierarchical representation of the graph if this node is its root
+	 * node Cycles are truncated in this representation for the result to be
+	 * clearer, a node is represented by a single line (toString method called on
+	 * the contained data on a single line)
+	 */
 	public String toStringRecurs() {
 		HashSet<Object> hs = new HashSet<Object>();
 		hs.add(this);
@@ -83,6 +95,8 @@ public class NodeMultiple {
 	 * @return the {@code i}th daughter node, or {@code null} if it does not exist.
 	 */
 	public NodeMultiple getDaughter(int i) {
+		if (daughters == null)
+			return null;
 		if (i < 0 || i >= NODE_MAX_ARITY)
 			ErrorNaiveHandler.abort(ERROR_STATUS_INDEX_OUT_OF_RANGE, ERROR_MSG_INDEX_OUT_OF_RANGE);
 		return daughters[i];
@@ -97,12 +111,14 @@ public class NodeMultiple {
 	 * If a daughter node is already referred to at this index then it is erased
 	 * with {@code daughter}.
 	 * 
-	 * Aborts if the index {@code i} is out of range.
+	 * Aborts if the index {@code i} is out of range or if daughters is null.
 	 * 
 	 * @param daughter the node to be linked as a daughter of {@code this} node.
 	 * @param i        the daughter node's index
 	 */
 	public void setDaughter(NodeMultiple daughter, int i) {
+		if(daughters == null)
+			ErrorNaiveHandler.abort(ERROR_STATUS_DAUGHTER_IS_NULL, ERROR_MSG_DAUGHTER_IS_NULL);
 		if (i < 0 || i >= NODE_MAX_ARITY)
 			ErrorNaiveHandler.abort(ERROR_STATUS_INDEX_OUT_OF_RANGE, ERROR_MSG_INDEX_OUT_OF_RANGE);
 		daughters[i] = daughter;
@@ -117,9 +133,15 @@ public class NodeMultiple {
 
 	/**
 	 * @param daughters the daughters to set
+	 * return true if the value has been set (if daughter.length is equal to NODE_MAX_ARITY)
 	 */
-	public void setDaughters(NodeMultiple[] daughters) {
-		this.daughters = daughters;
+	public boolean setDaughters(NodeMultiple[] daughters) {
+		if(daughters != null)
+			if(daughters.length != NODE_MAX_ARITY)
+				return false;
+				
+		this.daughters = daughters; // can be set to null -> some methods may abort if daughters is null
+		return true;
 	}
 
 	/**
@@ -128,12 +150,16 @@ public class NodeMultiple {
 	 * If the max number of daughters ({@link #NODE_MAX_ARITY}) is already reached
 	 * nothing happens (no abort).
 	 * 
+	 * (aborts if daughters has been set to null)
+	 * 
 	 * @param daughter
 	 */
 	public void addDaughter(NodeMultiple daughter) {
-		if (daughter == null) {
+		if(daughters == null)
+			ErrorNaiveHandler.abort(ERROR_STATUS_DAUGHTER_IS_NULL, ERROR_MSG_DAUGHTER_IS_NULL); // daughters can be set to null by calling setDaughters()
+		
+		if(daughter == null)
 			return;
-		}
 
 		for (int i = 0; i < NODE_MAX_ARITY; ++i) {
 			if (daughters[i] == null) {
@@ -155,18 +181,18 @@ public class NodeMultiple {
 	 * @param data
 	 */
 	public void setData(Object data) {
-		this.data = data;
+		this.data = data; // can be set to null
 	}
 
 	/**
 	 * @return {@code true} if and only if this node has at least one non-null
-	 *         daughter node.
+	 *         daughter node. (daughters must be grouped to the left)
 	 */
 	public boolean hasDaughters() {
-		for (int i = 0; i < NODE_MAX_ARITY; ++i)
-			if (daughters[i] != null)
-				return true;
-		return false;
+		if(daughters == null || NODE_MAX_ARITY <= 0)
+			return false;
+		
+		return daughters[0] != null; // daughters must be grouped to the left : if the first one is null, the node has no daughters
 	}
 
 	/* Constructors */

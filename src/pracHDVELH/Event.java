@@ -60,7 +60,7 @@ public class Event extends NodeMultiple {
 	public String getData() {
 		if (super.getData() != null && super.getData().getClass().equals(String.class))
 			return (String) super.getData();
-		return null; // if date is not a String
+		return null; // if data is not a String
 	}
 
 	/**
@@ -75,9 +75,10 @@ public class Event extends NodeMultiple {
 	 * @see pracHDVELH.NodeMultiple#getDaughter(int)
 	 */
 	@Override
-	public Event getDaughter(int i) {
-		if (super.getDaughter(i) != null && super.getDaughter(i).getClass().equals(Event.class))
+	public Event getDaughter(int i) { // aborts if i is out of range
+		if (super.getDaughter(i) != null && Event.class.isAssignableFrom(super.getDaughter(i).getClass()))
 			return (Event) super.getDaughter(i);
+		
 		return null;
 	}
 
@@ -111,15 +112,23 @@ public class Event extends NodeMultiple {
 		return id;
 	}
 	
+	/*
+	 * prints the prompt, reads and interprets the answer
+	 */
 	private void readAnswer() {
-		gui.outputln(getData());
+		gui.outputln(super.toString());
 		gui.output(PROMPT_ANSWER);
 		setPlayerAnswer(gui.read());
 		setChosenPath(interpretAnswer());
 	}
 
+	/*
+	 * @see readAnswer
+	 * prints an error asks again if the input is incorrect
+	 * call run on the next node
+	 */
 	public void run() {
-		if (isFinal())
+		if (isFinal()) // no daughters
 			return;
 
 		readAnswer();
@@ -128,18 +137,28 @@ public class Event extends NodeMultiple {
 			readAnswer();
 		}
 
-		getDaughter(chosenPath).run();
+		getDaughter(chosenPath).run(); // recursive structure
 	}
-
+	
+	/*
+	 * the result looks like "Event #1 (pracHDVELH.Event): ...(node data)..."
+	 */
 	@Override
 	public String toString() {
-		return "Event #" + id + "(" + getClass().getName() + "): " + (String) getData();
+		return "Event #" + id + " (" + getClass().getName() + "): " + getData();
 	}
 
+	/*
+	 * returns true if the Event has no daughters (the daughters must grouped to the left)
+	 * */
 	public boolean isFinal() {
 		return !hasDaughters();
 	}
 
+	
+	/*
+	 * true if the index is the daughter at this index is not null and there are no null daughters at lower indexes
+	 * */
 	public boolean isInRange(int index) {
 		if (index < 0)
 			return false;
@@ -147,10 +166,14 @@ public class Event extends NodeMultiple {
 		while (max < NODE_MAX_ARITY && getDaughter(max) != null) {
 			max += 1;
 		}
-
 		return (index >= max ? false : true);
 	}
 
+	
+	/*
+	 * aborts if playerAnswer is null
+	 * returns the index corresponding to this answer (-1 if the answer is incorrect)
+	 */
 	public int interpretAnswer() {
 		if (playerAnswer == null) {
 			ErrorNaiveHandler.abort(ERROR_MSG_UNEXPECTED_END);
@@ -178,6 +201,9 @@ public class Event extends NodeMultiple {
 		this.id = nextId++;
 	}
 
+	/*
+	 * default constructor (default GUIManager and empty data (String))
+	 * */
 	public Event() {
 		this(new GUIManager(), "");
 	}

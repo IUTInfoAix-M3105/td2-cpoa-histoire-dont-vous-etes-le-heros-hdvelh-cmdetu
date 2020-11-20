@@ -87,7 +87,9 @@ public class Scenario {
 
 		Event event3 = new EventExactSolution(gui, "Wizard: how much is worth pi?", "3.14159", 4);
 		event2.setData(event2.getData() + " (3)2.3");
+		System.out.println("ICI");
 		event2.addDaughter(event3);
+		System.out.println(event2.getDaughter(2) == null ? "null----------" : "pas null");
 		event3.addDaughter(endEvent);
 		event3.addDaughter(event3);
 
@@ -105,9 +107,9 @@ public class Scenario {
 		event4.addDaughter(event2);
 		event4.addDaughter(endEvent);
 		event4.addDaughter(event3);
-		
+
 		gui.outputln(scenario.getHead().toStringRecurs());
-		gui.outputln("fin");
+		gui.outputln(event3.toString());
 
 		gui.outputln(scenario.run());
 	}
