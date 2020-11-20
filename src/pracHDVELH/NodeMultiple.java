@@ -52,6 +52,7 @@ public class NodeMultiple {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < level; ++i)
 			sb.append("\t");
+		
 
 		sb.append("- " + (data != null ? data.toString().replace('\n', ' ') : "null") + "\n");
 
