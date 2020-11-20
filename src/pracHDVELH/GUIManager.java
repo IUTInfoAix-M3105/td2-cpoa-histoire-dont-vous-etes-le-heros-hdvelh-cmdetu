@@ -17,6 +17,9 @@ public class GUIManager {
   private InputStream in;
   private Scanner inputReader;
   
+  /*
+   * reads a String
+   * */
   public String read() {
 	  return inputReader.nextLine();
   }

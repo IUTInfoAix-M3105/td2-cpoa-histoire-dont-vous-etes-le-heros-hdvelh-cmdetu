@@ -5,7 +5,6 @@
  */
 package pracHDVELH;
 
-import java.util.ArrayList;
 import java.lang.StringBuilder;
 import myUtils.ErrorNaiveHandler;
 import java.util.HashSet;
@@ -194,15 +193,7 @@ public class NodeMultiple {
 		
 		return daughters[0] != null; // daughters must be grouped to the left : if the first one is null, the node has no daughters
 	}
-
-	/* Constructors */
-	/**
-	 * Default constructor.
-	 */
-	public NodeMultiple() {
-		this.daughters = new NodeMultiple[NODE_MAX_ARITY];
-	}
-
+	
 	/**
 	 * Constructor. Sets the content data to {@code data} and creates an empty set
 	 * of daughters.
@@ -210,8 +201,16 @@ public class NodeMultiple {
 	 * @param data
 	 */
 	public NodeMultiple(Object data) {
-		this();
 		this.data = data;
+		this.daughters = new NodeMultiple[NODE_MAX_ARITY];
+	}
+
+	/* Constructors */
+	/**
+	 * Default constructor.
+	 */
+	public NodeMultiple() {
+		this(null);
 	}
 }
 

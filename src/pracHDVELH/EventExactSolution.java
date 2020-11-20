@@ -2,50 +2,87 @@ package pracHDVELH;
 
 public class EventExactSolution extends Event {
 
+	private static final int SUCCESS_EVENT_INDEX = 0;
+	private static final int ERROR_EVENT_INDEX = 1;
+	
+	/*
+	 * complete answer
+	 * */
 	private String exactAnswer;
+	
+	/*
+	 * minimum number of matching characters on the left for the answer to be accepted
+	 * */
 	private int precision;
-	private static final int SUCCESS_EVENT = 0;
-	private static final int ERROR_EVENT = 1;
 
+	
+	/*
+	 * checks if the answer is correct and returns the corresponding event index (-1 if the events or the exact answer are not set or if the player's answer is null)
+	 */
+	@Override
 	public int interpretAnswer() {
-		if (isFinal() || !isInRange(0) || !isInRange(1) || exactAnswer == null)
+		if (getPlayerAnswer() == null || isFinal() || !isInRange(0) || !isInRange(1) || exactAnswer == null)
 			return -1;
 		
 		if(precision == 0)
-			return SUCCESS_EVENT;
+			return SUCCESS_EVENT_INDEX;
 
 		if (getPlayerAnswer().startsWith(exactAnswer.substring(0, precision)))
-			return SUCCESS_EVENT;
+			return SUCCESS_EVENT_INDEX;
 
-		return ERROR_EVENT;
+		return ERROR_EVENT_INDEX;
 	}
 
+	/*
+	 * set the next events (success or error)
+	 * if one of them is null, interpretAnswer will return -1
+	 * */
 	public void setSuccessErrorEvents(Event successEvent, Event errorEvent) {
-		setDaughter(successEvent, SUCCESS_EVENT);
-		setDaughter(errorEvent, ERROR_EVENT);
+		setDaughter(successEvent, SUCCESS_EVENT_INDEX);
+		setDaughter(errorEvent, ERROR_EVENT_INDEX);
 	}
 	
+	/*
+	 * the exact answer
+	 * */
 	public String getExactAnswer() {
 		return this.exactAnswer;
 	}
 	
+	/*
+	 * minimum number of matching characters on the left for the answer to be accepted
+	 * */
 	public int getPrecision() {
 		return this.precision;
 	}
 	
-	public void setExactAnswser(String exactAnswer) {
-		this.exactAnswer = exactAnswer;
-		if (exactAnswer != null)
-			this.precision = exactAnswer.length();
+	/*
+	 * @param exactAnswer
+	 * the precision is automatically set to the new answer length
+	 * */
+	public void setExactAnswer(String exactAnswer) {
+		if(exactAnswer == null)
+			setExactAnswer(exactAnswer, 0);
 		else
-			this.precision = 0;
+			setExactAnswer(exactAnswer, exactAnswer.length());
 	}
 	
+	
+	/*
+	 * @param exactAnswer
+	 * the precision is automatically set to the new answer length
+	 **/
 	public void setExactAnswer(String exactAnswer, int precision) {
 		this.exactAnswer = exactAnswer;
 		setPrecision(precision);
 	}
 	
+	/*
+	 * @param precision
+	 * can't be lower than 0 or higher than the answer length (if precision < 0, it is set to 0 and if precision > exactAnswer.length(), it is set to exactAnswer.length())
+	 * can't be set (= 0) if exactAnswer is null
+	 * 
+	 * */
 	public void setPrecision(int precision) {
 		if (precision < 0 || exactAnswer == null)
 			this.precision = 0;
@@ -55,20 +92,37 @@ public class EventExactSolution extends Event {
 			this.precision = precision;
 	}
 
+	// contructors
+	
+	/*
+	 * default constructor
+	 * exactAnswer and data are empty strings and precision is set to 0
+	 * default GUIManager
+	 * */
+	public EventExactSolution() {
+		this("");
+	}
+	
+	/*
+	 * default GUIManager and empty data.
+	 * precision is set to the exactAnswer length (0 if null or empty)
+	 * */
 	public EventExactSolution(String exactAnswer) {
-		super();
-		setExactAnswser(exactAnswer);
+		this(new GUIManager(), "", exactAnswer);
 	}
 
+	/*
+	 * precision is set to the exactAnswer length (0 if null or empty)
+	 * */
 	public EventExactSolution(GUIManager gui, String data, String exactAnswer) {
-		super(gui, data);
-		setExactAnswser(exactAnswer); // évite de faire deux allocations
-		setGui(gui);
-		setData(data);
+		this(gui, data, exactAnswer, (exactAnswer == null ? 0 : exactAnswer.length()));
 	}
 
+	/*
+	 * @see setPrecision
+	 * */
 	public EventExactSolution(GUIManager gui, String data, String exactAnswer, int precision) {
-		this(gui, data, exactAnswer);
-		setPrecision(precision);
+		super(gui, data);
+		setExactAnswer(exactAnswer, precision);
 	}
 }

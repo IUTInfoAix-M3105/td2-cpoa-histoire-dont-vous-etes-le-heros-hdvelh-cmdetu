@@ -5,8 +5,6 @@
  */
 package pracHDVELH;
 
-import java.util.Scanner;
-
 import myUtils.ErrorNaiveHandler;
 
 /**
@@ -18,11 +16,29 @@ public class Event extends NodeMultiple {
 	public static final String PROMPT_ANSWER = "Answer: ";
 	public static final String WARNING_MSG_INTEGER_EXPECTED = "Please input a integer within range!";
 
+	/*
+	 * next Id to be used
+	 * */
 	private static int nextId = 0;
 
+	/*
+	 * node Id
+	 * */
 	private int id;
+	
+	/*
+	 * graphical user interface manager
+	 * */
 	private GUIManager gui;
+	
+	/*
+	 * answer given by the player
+	 * */
 	private String playerAnswer;
+	
+	/*
+	 * index of the next node to be visited
+	 * */
 	private int chosenPath;
 
 	/**
@@ -128,9 +144,11 @@ public class Event extends NodeMultiple {
 	 * call run on the next node
 	 */
 	public void run() {
-		if (isFinal()) // no daughters
+		if (isFinal()) { // no daughters
+			gui.outputln(super.toString());
 			return;
-
+		}
+		
 		readAnswer();
 		while (chosenPath == -1) {
 			gui.outputln(WARNING_MSG_INTEGER_EXPECTED + "\n");
@@ -182,6 +200,8 @@ public class Event extends NodeMultiple {
 		if(!playerAnswer.matches("[1-9]+"))
 			return -1;
 		
+		// player answer is not null, not empty and is numeric
+		
 		int res = Integer.parseInt(playerAnswer);
 		res -= 1;
 
@@ -193,7 +213,7 @@ public class Event extends NodeMultiple {
 	
 	/*
 	 * chosenPath = 0 (default)
-	 * playerAnswer will be initializer later
+	 * playerAnswer will be initialized later
 	 * */
 	public Event(GUIManager gui, String data) {
 		super(data);

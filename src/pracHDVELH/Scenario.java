@@ -5,8 +5,6 @@
  */
 package pracHDVELH;
 
-import myUtils.ErrorNaiveHandler;
-
 /**
  * @author prost
  *
@@ -14,31 +12,58 @@ import myUtils.ErrorNaiveHandler;
 public class Scenario {
 	private static final String MSG_EMPTY_SCENARIO = "Sorry, no scenario was found.";
 	private static final String MSG_FINALE = "That's all folks!";
+	
+	/*
+	 * first event of this scenario
+	 * */
 	private Event head;
+	
+	/*
+	 * graphical user interface manager
+	 * */
 	private GUIManager gui;
 
 	
+	/*
+	 * constructor
+	 * */
 	public Scenario(GUIManager gui, Event head) {
 		this.gui = gui;
 		this.head = head;
 	}
 	
+	/*
+	 * @return first event
+	 * */
 	public Event getHead() {
 		return head;
 	}
 	
+	/*
+	 * @return gui
+	 * */
 	public GUIManager getGui() {
 		return gui;
 	}
 	
+	/*
+	 * @param head
+	 * */
 	public void setHead(Event head) {
 		this.head = head;
 	}
 	
+	/*
+	 * @param gui
+	 * */
 	public void setGui(GUIManager gui) {
 		this.gui = gui;
 	}
 	
+	/*
+	 * run the scenario.
+	 * head is the first event to be executed (if not null).
+	 * */
 	public String run() {
 		if(head == null) {
 			gui.output(MSG_EMPTY_SCENARIO);
@@ -87,9 +112,7 @@ public class Scenario {
 
 		Event event3 = new EventExactSolution(gui, "Wizard: how much is worth pi?", "3.14159", 4);
 		event2.setData(event2.getData() + " (3)2.3");
-		System.out.println("ICI");
 		event2.addDaughter(event3);
-		System.out.println(event2.getDaughter(2) == null ? "null----------" : "pas null");
 		event3.addDaughter(endEvent);
 		event3.addDaughter(event3);
 
@@ -102,7 +125,7 @@ public class Scenario {
 		// ...
 
 		int[] mask = { 3, 6, 7 };
-		Event event4 = new EventRandomSolution(gui, "Random choice of the next event...", mask, "Dice rolling... Roll=", "\nNext event is ");
+		Event event4 = new EventRandomSolution(gui, "Random choice of the next event...", mask, "Dice rolling... Roll=", "Next event is ");
 		event3.setDaughter(event4, 0);
 		event4.addDaughter(event2);
 		event4.addDaughter(endEvent);
