@@ -54,18 +54,17 @@ public class NodeMultiple {
 			sb.append("\t");
 		
 
-		sb.append("- " + (data != null ? data.toString().replace('\n', ' ') : "null") + "\n");
+		sb.append("- " + (data != null ? data.toString().replace('\n', ' ') : "null data") + "\n");
 
 		if (daughters != null) {
-			for (int i = 0; i < NODE_MAX_ARITY; ++i) {
-				if (daughters[i] != null) {
-					HashSet<Object> hs = (HashSet<Object>) visitedNodes.clone();
-					if (hs.add(daughters[i]))
-						sb.append(daughters[i].privateToStringRecurs(hs, level + 1));
+			for(NodeMultiple node : daughters) {
+				if (node != null) {
+					if (visitedNodes.add(node))
+						sb.append(node.privateToStringRecurs(visitedNodes, level + 1));
 					else {
 						for (int j = 0; j < level + 1; ++j)
 							sb.append("\t");
-						sb.append("- " + (daughters[i].getData() != null ? daughters[i].getData().toString().replace('\n', ' ') : "null") + "\n");
+						sb.append("- " + (node.getData() != null ? node.getData().toString().replace('\n', ' ') : "null data") + "\n");
 					}
 				}
 			}
